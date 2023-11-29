@@ -1,0 +1,341 @@
+#include <iostream>
+#include <climits>
+
+using namespace std;
+
+class Node {
+public:
+    int data;
+    Node* next;
+
+    Node(int value) : data(value), next(nullptr) {}
+};
+
+class SinglyLinkedList {
+private:
+    Node* head;
+
+public:
+    SinglyLinkedList() : head(nullptr) {}
+
+    ~SinglyLinkedList() {
+        while (head) {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+
+    void addFirst(int value) {
+        Node* newNode = new Node(value);
+        newNode->next = head;
+        head = newNode;
+    }
+
+    void addLast(int value) {
+        Node* newNode = new Node(value);
+        if (!head) {
+            head = newNode;
+            return;
+        }
+
+        Node* current = head;
+        while (current->next) {
+            current = current->next;
+        }
+        current->next = newNode;
+    }
+
+    void deleteFirst() {
+        if (head) {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+        } else {
+            cout << "List is empty. Cannot delete from an empty list." << endl;
+        }
+    }
+
+    void deleteLast() {
+        if (!head) {
+            cout << "List is empty. Cannot delete from an empty list." << endl;
+            return;
+        }
+
+        if (!head->next) {
+            delete head;
+            head = nullptr;
+            return;
+        }
+
+        Node* current = head;
+        while (current->next->next) {
+            current = current->next;
+        }
+        delete current->next;
+        current->next = nullptr;
+    }
+
+    void insertAt(int value, int index) {
+        if (index < 0) {
+            cout << "Invalid index." << endl;
+            return;
+        }
+
+        Node* newNode = new Node(value);
+        if (index == 0) {
+            newNode->next = head;
+            head = newNode;
+            return;
+        }
+
+        Node* current = head;
+        for (int i = 0; i < index - 1 && current; ++i) {
+            current = current->next;
+        }
+
+        if (!current) {
+            cout << "Invalid index" << endl;
+            delete newNode;
+            return;
+        }
+
+        newNode->next = current->next;
+        current->next = newNode;
+    }
+
+    bool search(int value) {
+        Node* current = head;
+        while (current) {
+            if (current->data == value) {
+                return true;
+            }
+            current = current->next;
+        }
+        return false;
+    }
+
+    bool isPalindrome() {
+        if (!head || !head->next) {
+            return true; // An empty list or a list with a single node is always a palindrome.
+        }
+
+        // Find the middle of the linked list
+        Node* slow = head;
+        Node* fast = head;
+
+        while (fast && fast->next) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+
+        // Reverse the second half of the linked list
+        Node* prev = nullptr;
+        Node* current = slow;
+        Node* next = nullptr;
+
+        while (current) {
+            next = current->next;
+            current->next = prev;
+            prev = current;
+            current = next;
+        }
+
+        // Compare the reversed second half with the first half
+        Node* firstHalf = head;
+        Node* secondHalf = prev;
+
+        while (secondHalf) {
+            if (firstHalf->data != secondHalf->data) {
+                return false; // Not a palindrome
+            }
+            firstHalf = firstHalf->next;
+            secondHalf = secondHalf->next;
+        }
+
+        return true; // It's a palindrome
+    }
+
+    int countNodes() {
+        int count = 0;
+        Node* current = head;
+        while (current) {
+            ++count;
+            current = current->next;
+        }
+        return count;
+    }
+
+    int max() {
+        int maxVal = INT_MIN;
+        Node* current = head;
+        while (current) {
+            maxVal = std::max(maxVal, current->data);
+            current = current->next;
+        }
+        return maxVal;
+    }
+
+    double average() {
+        if (!head) {
+            return 0.0;
+        }
+
+        int sum = 0, count = 0;
+        Node* current = head;
+        while (current) {
+            sum += current->data;
+            ++count;
+            current = current->next;
+        }
+
+        return static_cast<double>(sum) / count;
+    }
+
+    void reverse() {
+        Node* prev = nullptr;
+        Node* current = head;
+        Node* next = nullptr;
+
+        while (current) {
+            next = current->next;
+            current->next = prev;
+            prev = current;
+            current = next;
+        }
+
+        head = prev;
+    }
+
+    bool detectLoop() {
+        Node* slow = head;
+        Node* fast = head;
+
+        while (fast && fast->next) {
+            slow = slow->next;
+            fast = fast->next->next;
+
+            if (slow == fast) {
+                // Detected a loop
+                return true;
+            }
+        }
+
+        // No loop found
+        return false;
+    }
+};
+
+void printMenu() {
+    cout << "Linked List Operations:" << endl
+         << "1. Add First" << endl
+         << "2. Add Last" << endl
+         << "3. Delete First" << endl
+         << "4. Delete Last" << endl
+         << "5. Insert At" << endl
+         << "6. Search" << endl
+         << "7. Is Palindrome" << endl
+         << "8. Count Nodes" << endl
+         << "9. Max Value" << endl
+         << "10. Average" << endl
+         << "11. Reverse" << endl
+         << "12. Detect Loop" << endl
+         << "0. Exit" << endl
+         << "Enter your choice: ";
+}
+
+int main() {
+    SinglyLinkedList linkedList;
+
+    // Initial data: 5, 7, 6, 9, 10
+    linkedList.addLast(5);
+    linkedList.addLast(7);
+    linkedList.addLast(6);
+    linkedList.addLast(9);
+    linkedList.addLast(10);
+
+    int choice;
+    do {
+        printMenu();
+        cin >> choice;
+
+        switch (choice) {
+            case 1: {
+                int value;
+                cout << "Enter value to add: ";
+                cin >> value;
+                linkedList.addFirst(value);
+                break;
+            }
+            case 2: {
+                int value;
+                cout << "Enter value to add: ";
+                cin >> value;
+                linkedList.addLast(value);
+                break;
+            }
+            case 3:
+                linkedList.deleteFirst();
+                break;
+            case 4:
+                linkedList.deleteLast();
+                break;
+                        case 5: {
+                int value, index;
+                cout << "Enter value to insert: ";
+                cin >> value;
+                cout << "Enter index to insert at: ";
+                cin >> index;
+                linkedList.insertAt(value, index);
+                break;
+            }
+            case 6: {
+                int value;
+                cout << "Enter value to search: ";
+                cin >> value;
+                if (linkedList.search(value)) {
+                    cout << "Value found in the list." << endl;
+                } else {
+                    cout << "Value not found in the list." << endl;
+                }
+                break;
+            }
+            case 7:
+                if (linkedList.isPalindrome()) {
+                    cout << "The linked list is a palindrome." << endl;
+                } else {
+                    cout << "The linked list is not a palindrome." << endl;
+                }
+                break;
+            case 8:
+                cout << "Number of nodes in the linked list: " << linkedList.countNodes() << endl;
+                break;
+            case 9:
+                cout << "Maximum value in the linked list: " << linkedList.max() << endl;
+                break;
+            case 10:
+                cout << "Average value of the linked list: " << linkedList.average() << endl;
+                break;
+            case 11:
+                linkedList.reverse();
+                cout << "Linked list reversed." << endl;
+                break;
+            case 12:
+                if (linkedList.detectLoop()) {
+                    cout << "Loop detected in the linked list." << endl;
+                } else {
+                    cout << "No loop found in the linked list." << endl;
+                }
+                break;
+            case 0:
+                cout << "Exiting program." << endl;
+                break;
+            default:
+                cout << "Invalid choice. Please enter a valid option." << endl;
+        }
+
+    } while (choice != 0);
+
+    return 0;
+}
+
