@@ -1,0 +1,1133 @@
+#include <iostream>
+#include <climits>
+
+using namespace std;
+
+class Node {
+public:
+    int data;
+    Node* next;
+    Node* prev;
+
+    Node(int value) : data(value), next(nullptr), prev(nullptr){}
+};
+
+class SinglyLinkedList {
+private:
+    Node* head;
+
+public:
+    SinglyLinkedList() : head(nullptr) {}
+
+    ~SinglyLinkedList() {
+        while (head) {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+
+    void addFirst(int value) {
+        Node* newNode = new Node(value);
+        newNode->next = head;
+        head = newNode;
+    }
+
+    void addLast(int value) {
+        Node* newNode = new Node(value);
+        if (!head) {
+            head = newNode;
+            return;
+        }
+
+        Node* current = head;
+        while (current->next) {
+            current = current->next;
+        }
+        current->next = newNode;
+    }
+
+    void deleteFirst() {
+        if (head) {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+        } else {
+            cout << "List is empty. Cannot delete from an empty list." << endl;
+        }
+    }
+
+    void deleteLast() {
+        if (!head) {
+            cout << "List is empty. Cannot delete from an empty list." << endl;
+            return;
+        }
+
+        if (!head->next) {
+            delete head;
+            head = nullptr;
+            return;
+        }
+
+        Node* current = head;
+        while (current->next->next) {
+            current = current->next;
+        }
+        delete current->next;
+        current->next = nullptr;
+    }
+
+    void insertAt(int value, int index) {
+        if (index < 0) {
+            cout << "Invalid index." << endl;
+            return;
+        }
+
+        Node* newNode = new Node(value);
+        if (index == 0) {
+            newNode->next = head;
+            head = newNode;
+            return;
+        }
+
+        Node* current = head;
+        for (int i = 0; i < index - 1 && current; ++i) {
+            current = current->next;
+        }
+
+        if (!current) {
+            cout << "Invalid index" << endl;
+            delete newNode;
+            return;
+        }
+
+        newNode->next = current->next;
+        current->next = newNode;
+    }
+
+    bool search(int value) {
+        Node* current = head;
+        while (current) {
+            if (current->data == value) {
+                return true;
+            }
+            current = current->next;
+        }
+        return false;
+    }
+
+    bool isPalindrome() {
+        if (!head || !head->next) {
+            return true; 
+        }
+
+        Node* slow = head;
+        Node* fast = head;
+
+        while (fast && fast->next) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+
+        Node* prev = nullptr;
+        Node* current = slow;
+        Node* next = nullptr;
+
+        while (current) {
+            next = current->next;
+            current->next = prev;
+            prev = current;
+            current = next;
+        }
+
+        Node* firstHalf = head;
+        Node* secondHalf = prev;
+
+        while (secondHalf) {
+            if (firstHalf->data != secondHalf->data) {
+                return false; 
+            }
+            firstHalf = firstHalf->next;
+            secondHalf = secondHalf->next;
+        }
+
+        return true; 
+    }
+
+    int countNodes() {
+        int count = 0;
+        Node* current = head;
+        while (current) {
+            ++count;
+            current = current->next;
+        }
+        return count;
+    }
+
+    int max() {
+        int maxVal = INT_MIN;
+        Node* current = head;
+        while (current) {
+            maxVal = std::max(maxVal, current->data);
+            current = current->next;
+        }
+        return maxVal;
+    }
+
+    double average() {
+        if (!head) {
+            return 0.0;
+        }
+
+        int sum = 0, count = 0;
+        Node* current = head;
+        while (current) {
+            sum += current->data;
+            ++count;
+            current = current->next;
+        }
+
+        return static_cast<double>(sum) / count;
+    }
+
+    void reverse() {
+        Node* prev = nullptr;
+        Node* current = head;
+        Node* next= nullptr;
+
+        while (current) {
+            next = current->next;
+            current->next = prev;
+            prev = current;
+            current = next;
+        }
+
+        head = prev;
+    }
+
+    bool detectLoop() {
+        Node* slow = head;
+        Node* fast = head;
+
+        while (fast && fast->next) {
+            slow = slow->next;
+            fast = fast->next->next;
+
+            if (slow == fast) {
+                
+                return true;
+            }
+        }
+
+        
+        return false;
+    }
+      void printList() const {
+        Node* current = head;
+        cout << "Singly Linked List: ";
+        while (current) {
+            cout << current->data << " ";
+            current = current->next;
+        }
+        cout << endl;
+    }
+};
+
+class DoublyLinkedList{
+private:
+    Node* head;
+
+public:
+    DoublyLinkedList() : head(nullptr) {}
+
+    ~DoublyLinkedList() {
+        while (head) {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+
+    void addFirst(int value) {
+        Node* newNode = new Node(value);
+        newNode->next = head;
+        if (head) {
+            head->prev = newNode;
+        }
+        head = newNode;
+    }
+
+    void addLast(int value) {
+        Node* newNode = new Node(value);
+        if (!head) {
+            head = newNode;
+            return;
+        }
+
+        Node* current = head;
+        while (current->next) {
+            current = current->next;
+        }
+
+        current->next = newNode;
+        newNode->prev = current;
+    }
+    void insertAt(int value, int index) {
+    if (index < 0) {
+        std::cout << "Invalid index." << std::endl;
+        return;
+    }
+
+    Node* newNode = new Node(value);
+
+    if (index == 0) {
+        newNode->next = head;
+        if (head) {
+            head->prev = newNode;
+        }
+        head = newNode;
+        return;
+    }
+
+    Node* current = head;
+    for (int i = 0; i < index - 1 && current; ++i) {
+        current = current->next;
+    }
+
+    if (!current) {
+        std::cout << "Invalid index" << std::endl;
+        delete newNode;
+        return;
+    }
+
+    newNode->next = current->next;
+    newNode->prev = current;
+    if (current->next) {
+        current->next->prev = newNode;
+    }
+    current->next = newNode;
+}
+
+
+    void deleteFirst() {
+        if (head) {
+            Node* temp = head;
+            head = head->next;
+            if (head) {
+                head->prev = nullptr;
+            }
+            delete temp;
+        } else {
+            cout << "List is empty. Cannot delete from an empty list." << endl;
+        }
+    }
+
+    void deleteLast() {
+        if (!head) {
+            cout << "List is empty. Cannot delete from an empty list." << endl;
+            return;
+        }
+
+        if (!head->next) {
+            delete head;
+            head = nullptr;
+            return;
+        }
+
+        Node* current = head;
+        while (current->next) {
+            current = current->next;
+        }
+
+        current->prev->next = nullptr;
+        delete current;
+    }
+    int countNodes() {
+        int count = 0;
+        Node* current = head;
+        while (current) {
+            ++count;
+            current = current->next;
+        }
+        return count;
+    }
+
+    bool search(int value) {
+        Node* current = head;
+        while (current) {
+            if (current->data == value) {
+                return true;
+            }
+            current = current->next;
+        }
+        return false;
+    }
+
+    int max() {
+        int maxVal = INT_MIN;
+        Node* current = head;
+        while (current) {
+            maxVal = std::max(maxVal, current->data);
+            current = current->next;
+        }
+        return maxVal;
+    }
+
+    double average() {
+        if (!head) {
+            return 0.0;
+        }
+
+        int sum = 0, count = 0;
+        Node* current = head;
+        while (current) {
+            sum += current->data;
+            ++count;
+            current = current->next;
+        }
+
+        return static_cast<double>(sum) / count;
+    }
+
+    void reverse() {
+        Node* current = head;
+        Node* temp = nullptr;
+
+        while (current) {
+            temp = current->prev;
+            current->prev = current->next;
+            current->next = temp;
+            current = current->prev;
+        }
+
+        if (temp) {
+            head = temp->prev;
+        }
+    }
+
+    bool detectLoop() {
+        Node* slow = head;
+        Node* fast = head;
+
+        while (fast && fast->next) {
+            slow = slow->next;
+            fast = fast->next->next;
+
+            if (slow == fast) {
+                
+                return true;
+            }
+        }
+        return false;
+    }
+     void printList() const {
+        Node* current = head;
+        cout << "Doubly Linked List: ";
+        while (current) {
+            cout << current->data << " ";
+            current = current->next;
+        }
+        cout << endl;
+    }    
+};
+
+class CircularLinkedList {
+private:
+    Node* head;
+
+public:
+    CircularLinkedList() : head(nullptr) {}
+
+    ~CircularLinkedList() {
+        if (!head) {
+            return;
+        }
+
+        Node* current = head->next;
+        while (current && current != head) {
+            Node* temp = current;
+            current = current->next;
+            delete temp;
+        }
+
+        delete head;
+    }
+
+    void addFirst(int value) {
+        Node* newNode = new Node(value);
+
+        if (!head) {
+            head = newNode;
+            head->next = head;
+            return;
+        }
+
+        Node* last = head;
+        while (last->next != head) {
+            last = last->next;
+        }
+
+        newNode->next = head;
+        head = newNode;
+        last->next = newNode;
+    }
+
+    void addLast(int value) {
+        Node* newNode = new Node(value);
+
+        if (!head) {
+            head = newNode;
+            head->next = head;
+            return;
+        }
+
+        Node* last = head;
+        while (last->next != head) {
+            last = last->next;
+        }
+
+        newNode->next = head;
+        last->next = newNode;
+    }
+
+    void insertAt(int value, int index) {
+        if (index < 0) {
+            std::cout << "Invalid index." << std::endl;
+            return;
+        }
+
+        Node* newNode = new Node(value);
+
+        if (index == 0) {
+            addFirst(value);
+            return;
+        }
+
+        Node* current = head;
+        for (int i = 0; i < index - 1 && current->next != head; ++i) {
+            current = current->next;
+        }
+
+        newNode->next = current->next;
+        current->next = newNode;
+    }
+
+    void deleteFirst() {
+        if (!head) {
+            std::cout << "List is empty. Cannot delete from an empty list." << std::endl;
+            return;
+        }
+
+        Node* temp = head;
+
+        if (head->next == head) {
+            head = nullptr;
+        } else {
+            Node* last = head;
+            while (last->next != head) {
+                last = last->next;
+            }
+
+            head = head->next;
+            last->next = head;
+        }
+
+        delete temp;
+    }
+
+    void deleteLast() {
+        if (!head) {
+            std::cout << "List is empty. Cannot delete from an empty list." << std::endl;
+            return;
+        }
+
+        Node* temp = head;
+        Node* last = nullptr;
+
+        while (temp->next != head) {
+            last = temp;
+            temp = temp->next;
+        }
+
+        if (last) {
+            last->next = head;
+        } else {
+            head = nullptr;
+        }
+
+        delete temp;
+    }
+
+    int countNodes() {
+        int count = 0;
+
+        if (!head) {
+            return count;
+        }
+
+        Node* current = head;
+
+        do {
+            ++count;
+            current = current->next;
+        } while (current != head);
+
+        return count;
+    }
+
+    bool search(int value) {
+        if (!head) {
+            return false;
+        }
+
+        Node* current = head;
+
+        do {
+            if (current->data == value) {
+                return true;
+            }
+            current = current->next;
+        } while (current != head);
+
+        return false;
+    }
+
+    int max() {
+        if (!head) {
+            return INT_MIN;
+        }
+
+        int maxVal = head->data;
+        Node* current = head->next;
+
+        do {
+            maxVal = std::max(maxVal, current->data);
+            current = current->next;
+        } while (current != head);
+
+        return maxVal;
+    }
+
+    double average() {
+        if (!head) {
+            return 0.0;
+        }
+
+        int sum = 0;
+        int count = 0;
+
+        Node* current = head;
+
+        do {
+            sum += current->data;
+            ++count;
+            current = current->next;
+        } while (current != head);
+
+        return static_cast<double>(sum) / count;
+    }
+
+    void reverse() {
+        if (!head) {
+            return;
+        }
+
+        Node* current = head;
+        Node* prev = nullptr;
+        Node* next = nullptr;
+
+        do {
+            next = current->next;
+            current->next = prev;
+            prev = current;
+            current = next;
+        } while (current != head);
+
+        head = prev;
+    }
+
+    bool detectLoop() {
+        if (!head) {
+            return false;
+        }
+
+        Node* slow = head;
+        Node* fast = head;
+
+        do {
+            if (!fast || !fast->next) {
+                return false;
+            }
+
+            slow = slow->next;
+            fast = fast->next->next;
+        } while (slow != fast);
+
+        return true;
+    }
+    void printList() const {
+        if (!head) {
+            cout << "Circular Linked List: (Empty)" << endl;
+            return;
+        }
+
+        Node* current = head;
+        cout << "Circular Linked List: ";
+        do {
+            cout << current->data << " ";
+            current = current->next;
+        } while (current != head);
+        cout << endl;
+    }
+};
+
+class CircularDoublyLinkedList {
+private:
+    Node* head;
+
+public:
+    CircularDoublyLinkedList() : head(nullptr) {}
+
+    ~CircularDoublyLinkedList() {
+        if (!head) {
+            return;
+        }
+
+        Node* current = head->next;
+        while (current && current != head) {
+            Node* temp = current;
+            current = current->next;
+            delete temp;
+        }
+
+        delete head;
+    }
+
+    void addFirst(int value) {
+        Node* newNode = new Node(value);
+
+        if (!head) {
+            head = newNode;
+            head->next = head;
+            head->prev = head;
+            return;
+        }
+
+        Node* last = head->prev;
+
+        newNode->next = head;
+        newNode->prev = last;
+
+        last->next = newNode;
+        head->prev = newNode;
+
+        head = newNode;
+    }
+
+    void addLast(int value) {
+        Node* newNode = new Node(value);
+
+        if (!head) {
+            head = newNode;
+            head->next = head;
+            head->prev = head;
+            return;
+        }
+
+        Node* last = head->prev;
+
+        newNode->next = head;
+        newNode->prev = last;
+
+        last->next = newNode;
+        head->prev = newNode;
+    }
+
+    void insertAt(int value, int index) {
+        if (index < 0) {
+            std::cout << "Invalid index." << std::endl;
+            return;
+        }
+
+        Node* newNode = new Node(value);
+
+        if (index == 0) {
+            addFirst(value);
+            return;
+        }
+
+        Node* current = head;
+        for (int i = 0; i < index - 1 && current->next != head; ++i) {
+            current = current->next;
+        }
+
+        newNode->next = current->next;
+        newNode->prev = current;
+        current->next->prev = newNode;
+        current->next = newNode;
+    }
+
+    void deleteFirst() {
+        if (!head) {
+            std::cout << "List is empty. Cannot delete from an empty list." << std::endl;
+            return;
+        }
+
+        Node* temp = head;
+
+        if (head->next == head) {
+            head = nullptr;
+        } else {
+            head->prev->next = head->next;
+            head->next->prev = head->prev;
+            head = head->next;
+        }
+
+        delete temp;
+    }
+
+    void deleteLast() {
+        if (!head) {
+            std::cout << "List is empty. Cannot delete from an empty list." << std::endl;
+            return;
+        }
+
+        Node* temp = head->prev;
+
+        if (temp == head) {
+            head = nullptr;
+        } else {
+            temp->prev->next = head;
+            head->prev = temp->prev;
+        }
+
+        delete temp;
+    }
+
+    int countNodes() {
+        int count = 0;
+
+        if (!head) {
+            return count;
+        }
+
+        Node* current = head;
+
+        do {
+            ++count;
+            current = current->next;
+        } while (current != head);
+
+        return count;
+    }
+
+    bool search(int value) {
+        if (!head) {
+            return false;
+        }
+
+        Node* current = head;
+
+        do {
+            if (current->data == value) {
+                return true;
+            }
+            current = current->next;
+        } while (current != head);
+
+        return false;
+    }
+
+    int max() {
+        if (!head) {
+            return INT_MIN;
+        }
+
+        int maxVal = head->data;
+        Node* current = head->next;
+
+        do {
+            maxVal = std::max(maxVal, current->data);
+            current = current->next;
+        } while (current != head);
+
+        return maxVal;
+    }
+
+    double average() {
+        if (!head) {
+            return 0.0;
+        }
+
+        int sum = 0;
+        int count = 0;
+
+        Node* current = head;
+
+        do {
+            sum += current->data;
+            ++count;
+            current = current->next;
+        } while (current != head);
+
+        return static_cast<double>(sum) / count;
+    }
+
+    void reverse() {
+        if (!head) {
+            return;
+        }
+
+        Node* current = head;
+        Node* temp = nullptr;
+
+        do {
+            temp = current->prev;
+            current->prev = current->next;
+            current->next = temp;
+            current = current->prev;
+        } while (current != head);
+
+        head = temp->prev;
+    }
+
+    bool detectLoop() {
+        if (!head) {
+            return false;
+        }
+
+        Node* slow = head;
+        Node* fast = head;
+
+        do {
+            if (!fast || !fast->next) {
+                return false;
+            }
+
+            slow = slow->next;
+            fast = fast->next->next;
+        } while (slow != fast);
+
+        return true;
+    }
+     void printList() const {
+        if (!head) {
+            cout << "Circular Doubly Linked List: (Empty)" << endl;
+            return;
+        }
+
+        Node* current = head;
+        cout << "Circular Doubly Linked List: ";
+        do {
+            cout << current->data << " ";
+            current = current->next;
+        } while (current != head);
+        cout << endl;
+    }
+};
+
+void printCommonList(const SinglyLinkedList& list) {
+    list.printList();
+}
+
+void printCommonList(const DoublyLinkedList& list) {
+    list.printList();
+}
+
+void printCommonList(const CircularLinkedList& list) {
+    list.printList();
+}
+
+void printCommonList(const CircularDoublyLinkedList& list) {
+    list.printList();
+}
+
+
+
+int main() {
+    SinglyLinkedList singlyList;
+    DoublyLinkedList doublyList;
+    CircularLinkedList circularList;
+    CircularDoublyLinkedList circularDoublyList;
+
+    
+    singlyList.addLast(5);
+    singlyList.addLast(7);
+    singlyList.addLast(6);
+
+    doublyList.addLast(5);
+    doublyList.addLast(7);
+    doublyList.addLast(6);
+
+    circularList.addLast(5);
+    circularList.addLast(7);
+    circularList.addLast(6);
+
+    circularDoublyList.addLast(5);
+    circularDoublyList.addLast(7);
+    circularDoublyList.addLast(6);
+
+    int choice;
+    do {
+        
+        printCommonList(singlyList);
+        printCommonList(doublyList);
+        printCommonList(circularList);
+        printCommonList(circularDoublyList);
+
+        cout << "WELCOME TO CONSOLE SYSTEM" << endl;
+        cout << "Linked List Operations:" << endl
+             << "1. Add First" << endl
+             << "2. Add Last" << endl
+             << "3. Delete First" << endl
+             << "4. Delete Last" << endl
+             << "5. Insert At" << endl
+             << "6. Search" << endl
+             << "7. Count Nodes" << endl
+             << "8. Max Value" << endl
+             << "9. Average" << endl
+             << "10. Reverse" << endl
+             << "11. Detect Loop" << endl
+             << "12. Check Palindrome (Singly Linked List Only)" << endl
+             << "0. Exit" << endl
+             << "Enter your choice: ";
+        cin >> choice;
+
+        // Perform operations on all lists
+        switch (choice) {
+            case 1: {
+                int value;
+                cout << "Enter value to add: ";
+                cin >> value;
+                singlyList.addFirst(value);
+                doublyList.addFirst(value);
+                circularList.addFirst(value);
+                circularDoublyList.addFirst(value);
+                break;
+            }
+            case 2: {
+                int value;
+                cout << "Enter value to add: ";
+                cin >> value;
+                singlyList.addLast(value);
+                doublyList.addLast(value);
+                circularList.addLast(value);
+                circularDoublyList.addLast(value);
+                break;
+            }
+            case 3:
+                singlyList.deleteFirst();
+                doublyList.deleteFirst();
+                circularList.deleteFirst();
+                circularDoublyList.deleteFirst();
+                break;
+            case 4:
+                singlyList.deleteLast();
+                doublyList.deleteLast();
+                circularList.deleteLast();
+                circularDoublyList.deleteLast();
+                break;
+            case 5: {
+                int value, index;
+                cout << "Enter value to insert: ";
+                cin >> value;
+                cout << "Enter index to insert at: ";
+                cin >> index;
+                singlyList.insertAt(value, index);
+                doublyList.insertAt(value, index);
+                circularList.insertAt(value, index);
+                circularDoublyList.insertAt(value, index);
+                break;
+            }
+            case 6: {
+                int value;
+                cout << "Enter value to search: ";
+                cin >> value;
+                if (singlyList.search(value)) {
+                    cout << "Value found in the singly linked list." << endl;
+                } else {
+                    cout << "Value not found in the singly linked list." << endl;
+                }
+                if (doublyList.search(value)) {
+                    cout << "Value found in the doubly linked list." << endl;
+                } else {
+                    cout << "Value not found in the doubly linked list." << endl;
+                }
+                if (circularList.search(value)) {
+                    cout << "Value found in the circular linked list." << endl;
+                } else {
+                    cout << "Value not found in the circular linked list." << endl;
+                }
+                if (circularDoublyList.search(value)) {
+                    cout << "Value found in the circular doubly linked list." << endl;
+                } else {
+                    cout << "Value not found in the circular doubly linked list." << endl;
+                }
+                break;
+            }
+            case 7:
+                cout << "Number of nodes in the singly linked list: " << singlyList.countNodes() << endl;
+                cout << "Number of nodes in the doubly linked list: " << doublyList.countNodes() << endl;
+                cout << "Number of nodes in the circular linked list: " << circularList.countNodes() << endl;
+                cout << "Number of nodes in the circular doubly linked list: "
+                     << circularDoublyList.countNodes() << endl;
+                break;
+            case 8:
+                cout << "Maximum value in the singly linked list: " << singlyList.max() << endl;
+                cout << "Maximum value in the doubly linked list: " << doublyList.max() << endl;
+                cout << "Maximum value in the circular linked list: " << circularList.max() << endl;
+                cout << "Maximum value in the circular doubly linked list: " << circularDoublyList.max() << endl;
+                break;
+            case 9:
+                cout << "Average value of the singly linked list: " << singlyList.average() << endl;
+                cout << "Average value of the doubly linked list: " << doublyList.average() << endl;
+                cout << "Average value of the circular linked list: " << circularList.average() << endl;
+                cout << "Average value of the circular doubly linked list: " << circularDoublyList.average() << endl;
+                break;
+            case 10:
+                singlyList.reverse();
+                doublyList.reverse();
+                circularList.reverse();
+                circularDoublyList.reverse();
+                cout << "Linked lists reversed." << endl;
+                break;
+            case 11:
+                if (singlyList.detectLoop()) {
+                    cout << "Loop detected in the singly linked list." << endl;
+                } else {
+                    cout << "No loop found in the singly linked list." << endl;
+                }
+                if (doublyList.detectLoop()) {
+                    cout << "Loop detected in the doubly linked list." << endl;
+                } else {
+                    cout << "No loop found in the doubly linked list." << endl;
+                }
+                if (circularList.detectLoop()) {
+                    cout << "Loop detected in the circular linked list." << endl;
+                } else {
+                    cout << "No loop found in the circular linked list." << endl;
+                }
+                if (circularDoublyList.detectLoop()) {
+                    cout << "Loop detected in the circular doubly linked list." << endl;
+                } else {
+                    cout << "No loop found in the circular doubly linked list." << endl;
+                }
+                break;
+             case 12:
+                if (singlyList.isPalindrome()) {
+                    cout << "Singly linked list is a palindrome." << endl;
+                } else {
+                    cout << "Singly linked list is not a palindrome." << endl;
+                }
+                break;    
+            case 0:
+                cout << "Exit program." << endl;
+                break;
+            default:
+                cout << "Incorrect option. Please enter a correct option." << endl;
+        }
+
+    } while (choice != 0);
+
+    return 0;
+}
